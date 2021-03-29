@@ -4,7 +4,7 @@ metadata:
   name: backend-quota
 spec:
   hard:
-    pods: "3"
-    cpu: "1"
-    memory: 1Gi
+    pods: "10"
+    cpu: "10"
+    memory: 10Gi
 
