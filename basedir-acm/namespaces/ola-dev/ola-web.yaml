@@ -139,7 +139,6 @@ spec:
               path: nginx.conf
 
 ---
----
 apiVersion: v1
 kind: Service
 metadata:
