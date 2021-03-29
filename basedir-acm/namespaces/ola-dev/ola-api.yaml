@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ola
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      ola: api-app
+  template:
+    metadata:
+      labels:
+        ola: api-app
+    spec:
+      containers:
+      - name: ola-api
+        image: im3iodev/ola-api-poc:1.2
+        ports:
+          - containerPort: 9001
+        env:
+            - name: OA_API_DB_HOST
+              value: 10.54.240.3
+            - name: OA_API_DB_NAME
+              value: oa_appdb
+            - name: OA_API_DB_PASS
+              value: zpw2CDr4zfeciwMe
+            - name: OA_API_DB_PORT
+              value: "3306"
+            - name: OA_API_DB_USER
+              value: root
+            - name: OA_API_LOG_LEVEL
+              value: debug
+            - name: OA_API_LOG_SQL
+              value: "true"
+            - name: OA_API_ORDER_DEV_PREFIX
+              value: "15"
+            - name: OA_API_POSTPAID_DEV_PREFIX
+              value: "TESTMYIMTRI-"
+            - name: OA_API_POSTPAID_UPLOAD_MAX
+              value: 2M
+            - name: OA_API_SCHEDULER
+              value: "false"
+            - name: OA_API_NGSSP_BASEURL
+              value: "https://esb-test.indosatooredoo.com:8084/GenericReqHandler/ProvServiceAsync"
+        resources:
+            requests:
+                memory: "64Mi"
+                cpu: "250m"
+      restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-service
+spec:
+  type: ClusterIP
+  selector:
+    ola: api-app
+  ports:
+  - port: 9001
+    protocol: TCP
+    targetPort: 9001
