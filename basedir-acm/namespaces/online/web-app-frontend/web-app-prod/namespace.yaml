@@ -3,6 +3,8 @@ kind: Namespace
 metadata:
   name: web-app-prod
   labels:
-    env: prod
-  annotations:
-    audit: "true"
+    env: web-app-prod
+    istio-injection: enabled
+
+
+

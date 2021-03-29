@@ -2,3 +2,8 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: web-app-dev
+  labels:
+    env: web-app-dev
+    istio-injection: enabled
+
+

@@ -3,6 +3,6 @@ kind: Namespace
 metadata:
   name: ola-app-prod
   labels:
-    env: prod
-  annotations:
-    audit: "true"
+    env: ola-app-prod
+    istio-injection: enabled
+
