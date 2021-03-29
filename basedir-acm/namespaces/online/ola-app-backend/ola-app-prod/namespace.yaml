@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: shipping-prod
+  name: ola-app-prod
   labels:
     env: prod
   annotations:
