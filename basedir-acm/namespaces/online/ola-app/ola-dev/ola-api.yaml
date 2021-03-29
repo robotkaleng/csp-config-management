@@ -27,7 +27,7 @@ spec:
     spec:
       containers:
       - name: ola-api
-        image: im3iodev/ola-api-poc:1.1
+        image: im3iodev/ola-api-poc:1.2
         ports:
           - containerPort: 9001
         env:
