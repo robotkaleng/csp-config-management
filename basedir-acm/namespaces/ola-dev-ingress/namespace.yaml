@@ -5,4 +5,5 @@ metadata:
   labels:
     env: istio
     istio-injection: enabled
+    istio.io/rev: default
 
