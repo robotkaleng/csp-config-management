@@ -116,6 +116,7 @@ spec:
     metadata:
       labels:
         app: ola-web
+        service.istio.io/canonical-name: ola-web
     spec:
       containers:
       - name: ola-web
