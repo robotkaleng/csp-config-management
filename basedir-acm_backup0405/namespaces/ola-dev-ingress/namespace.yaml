@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ola-dev-ingress
+  labels:
+    env: istio
+    istio-injection: enabled
+    istio.io/rev: default
+
