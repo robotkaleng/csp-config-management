@@ -124,8 +124,12 @@ spec:
         ports:
         - containerPort: 80
         resources:
-            requests:
-                cpu: "250m"
+          requests:
+            cpu: 200m
+            memory: 64Mi
+          limits:
+            cpu: 300m
+            memory: 128Mi 
         volumeMounts:
             - name: nginx-conf
               mountPath: /etc/nginx/nginx.conf

@@ -76,24 +76,7 @@ spec:
             memory: 64Mi
           limits:
             cpu: 300m
-            memory: 128Mi
-        readinessProbe:
-          initialDelaySeconds: 15
-          httpGet:
-            path: /
-            port: 9001
-            httpHeaders:
-            - name: Custom-Header
-              value: Awesome  
-        livenessProbe:
-          initialDelaySeconds: 15
-          periodSeconds: 10
-          httpGet:
-            path: /
-            port: 9001
-            httpHeaders:
-            - name: Custom-Header
-              value: Awesome         
+            memory: 128Mi  
       restartPolicy: Always
 
 ---
