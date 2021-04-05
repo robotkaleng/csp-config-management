@@ -3,5 +3,4 @@ kind: Namespace
 metadata:
   name: audit
   labels:
-    env: istio
-    istio-injection: enabled
+    istio.io/rev: asm-192-1
