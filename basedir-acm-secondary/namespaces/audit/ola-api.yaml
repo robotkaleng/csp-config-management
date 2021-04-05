@@ -23,6 +23,7 @@ spec:
     metadata:
       labels:
         app: ola-api
+        service.istio.io/canonical-name: ola-api
     spec:
       containers:
       - name: ola-api
