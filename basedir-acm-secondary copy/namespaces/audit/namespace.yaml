@@ -1,0 +1,6 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: audit
+  labels:
+    istio.io/rev: asm-192-1

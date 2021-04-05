@@ -1,0 +1,166 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-conf
+data:
+  nginx.conf: |
+    events {
+      worker_connections 1024;
+    }
+
+    http {
+      include /etc/nginx/mime.types;
+      map $http_upgrade $connection_upgrade {
+        default upgrade;
+        '' close;
+    }
+
+      server {
+        root         /app;
+        index        index.html index.htm;
+        try_files    $uri /index.html =404;
+        gzip on;
+        gzip_vary on;
+        gzip_min_length 100;
+        gzip_proxied expired no-cache no-store private auth;
+        gzip_types text/plain text/css text/xml text/javascript application/javascript application/x-javascript application/xml;
+        gzip_disable "MSIE [1-6]\.";
+        gunzip on;
+
+        server_tokens off;
+
+        add_header X-Frame-Options SAMEORIGIN;
+
+        add_header X-Content-Type-Options nosniff;
+
+        add_header X-XSS-Protection "1; mode=block";
+
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.co.id https://www.google.com https://ssl.google-analytics.com https://www.google-analytics.com https://www.googletagmanager.com https://tagmanager.google.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://maps.googleapis.com https://connect.facebook.net https://rum-static.pingdom.net https://acdn.adnxs.com; img-src 'self' https://www.google.co.id https://www.google.com https://www.googletagmanager.com https://ssl.gstatic.com https://www.gstatic.com https://googleads.g.doubleclick.net https://ssl.google-analytics.com https://www.google-analytics.com https://maps.gstatic.com https://*.googleapis.com https://*.ggpht https://www.facebook.com https://connect.facebook.net https://s-static.ak.facebook.com https://ib.adnxs.com https://cost.affcost.com https://rum-collector-2.pingdom.net https://api.veritrans.co.id https://myim3banner.kloc.co https://im3-img.indosatooredoo.com data:; style-src 'self' 'unsafe-inline' https://tagmanager.google.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com https://themes.googleusercontent.com data:; frame-src 'self' https://bid.g.doubleclick.net https://www.facebook.com; connect-src 'self' https://www.google-analytics.com https://stats.g.doubleclick.net https://rum-collector-2.pingdom.net; object-src 'none'";
+
+        add_header Strict-Transport-Security "max-age=31536000; includeSubdomains; preload";
+
+        location / {
+                    try_files $uri /index.html;
+                  }
+
+
+        location /api/ {
+          proxy_pass           http://ola-api;
+          proxy_set_header     X-Real-IP $remote_addr;
+          proxy_set_header     X-Forwarded-Proto $scheme;
+          proxy_set_header     X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header     Host $http_host;
+          add_header Pragma    "no-cache";
+          proxy_http_version   1.1;
+          send_timeout         600;
+          proxy_read_timeout   300;
+          proxy_set_header     Connection "";
+          proxy_socket_keepalive on;
+          client_max_body_size 2M;
+        }
+
+        location /api/identity/ktp {
+          proxy_pass           http://ola-api/api/identity/ktp;
+          proxy_set_header     X-Real-IP $remote_addr;
+          proxy_set_header     X-Forwarded-Proto $scheme;
+          proxy_set_header     X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header     Host $http_host;
+          add_header Pragma    "no-cache";
+          proxy_http_version   1.1;
+          send_timeout         600;
+          proxy_read_timeout   300;
+          proxy_socket_keepalive on;
+          client_max_body_size 6M;
+        }
+
+        location /api/identity/agent/ktp {
+          proxy_pass           http://ola-api/api/identity/agent/ktp;
+          proxy_set_header     X-Real-IP $remote_addr;
+          proxy_set_header     X-Forwarded-Proto $scheme;
+          proxy_set_header     X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header     Host $http_host;
+          add_header Pragma    "no-cache";
+          proxy_http_version   1.1;
+          send_timeout         600;
+          proxy_read_timeout   300;
+          proxy_socket_keepalive on;
+          client_max_body_size 6M;
+        }
+
+        # Media: images, icons, fonts, video, audio, HTC
+        location ~* ^(?!\/(data|docs)\/).*\.(?:jpg|jpeg|gif|png|ico|cur|gz|svg|svgz|mp4|ogg|ogv|webm|htc|woff|ttf|otf|woff2|eot)$ {
+          expires 1y;
+          access_log off;
+          add_header Cache-Control "public";
+        }
+
+        # CSS and Javascript
+        location ~* \.(?:css|js)$ {
+          expires 1y;
+          access_log off;
+          add_header Cache-Control "public";
+          }
+        }
+      }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ola-web
+spec:
+  selector:
+    matchLabels:
+      app: ola-web
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ola-web
+        service.istio.io/canonical-name: ola-web
+    spec:
+      containers:
+      - name: ola-web
+        image: im3iodev/ola-web-poc:1.0
+        ports:
+        - containerPort: 80
+        resources:
+            requests:
+                cpu: "250m"
+        volumeMounts:
+            - name: nginx-conf
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+              readOnly: true
+      volumes:
+      - name: nginx-conf
+        configMap:
+          name: nginx-conf
+          items:
+            - key: nginx.conf
+              path: nginx.conf
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ola-web
+spec:
+  type: ClusterIP
+  selector:
+    app: ola-web
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ola-web-external
+spec:
+  type: LoadBalancer
+  selector:
+    app: ola-web
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
