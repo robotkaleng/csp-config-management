@@ -1,0 +1,110 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ola-db-secret
+stringData:
+  hostdb: 10.54.240.3
+  dbname: oa_appdb
+  username: root
+  password: zpw2CDr4zfeciwMe
+  port: "3306"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ola-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ola-api
+  template:
+    metadata:
+      labels:
+        app: ola-api
+    spec:
+      containers:
+      - name: ola-api
+        image: im3iodev/ola-api-poc:1.2
+        ports:
+          - containerPort: 9001
+        env:
+            - name: OA_API_DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: ola-db-secret
+                  key: hostdb
+            - name: OA_API_DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: ola-db-secret
+                  key: dbname
+            - name: OA_API_DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: ola-db-secret
+                  key: password
+            - name: OA_API_DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: ola-db-secret
+                  key: port
+            - name: OA_API_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: ola-db-secret
+                  key: username
+            - name: OA_API_LOG_LEVEL
+              value: debug
+            - name: OA_API_LOG_SQL
+              value: "true"
+            - name: OA_API_ORDER_DEV_PREFIX
+              value: "15"
+            - name: OA_API_POSTPAID_DEV_PREFIX
+              value: "TESTMYIMTRI-"
+            - name: OA_API_POSTPAID_UPLOAD_MAX
+              value: 2M
+            - name: OA_API_SCHEDULER
+              value: "false"
+            - name: OA_API_NGSSP_BASEURL
+              value: "https://esb-test.indosatooredoo.com:8084/GenericReqHandler/ProvServiceAsync"
+        resources:
+          requests:
+            cpu: 200m
+            memory: 64Mi
+          limits:
+            cpu: 300m
+            memory: 128Mi
+        readinessProbe:
+          initialDelaySeconds: 15
+          httpGet:
+            path: /
+            port: 9001
+            httpHeaders:
+            - name: Custom-Header
+              value: Awesome  
+        livenessProbe:
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          httpGet:
+            path: /
+            port: 9001
+            httpHeaders:
+            - name: Custom-Header
+              value: Awesome         
+      restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ola-api
+spec:
+  type: ClusterIP
+  selector:
+    app: ola-api
+  ports:
+  - port: 9001
+    protocol: TCP
+    targetPort: 9001
