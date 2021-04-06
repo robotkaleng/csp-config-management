@@ -116,7 +116,7 @@ spec:
     metadata:
       labels:
         app: ola-web
-        service.istio.io/canonical-name: ola-web
+        service.istio.io/canonical-name: ola-web-service
     spec:
       serviceAccountName: default
       containers:
@@ -164,7 +164,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ola-web
+  name: ola-web-service
 spec:
   type: ClusterIP
   selector:
