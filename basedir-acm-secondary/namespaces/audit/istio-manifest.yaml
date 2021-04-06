@@ -93,4 +93,3 @@ spec:
         host: frontend
         port:
           number: 80
----
