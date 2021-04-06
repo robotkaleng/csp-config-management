@@ -23,6 +23,7 @@ spec:
     metadata:
       labels:
         app: ola-api
+        service.istio.io/canonical-name: ola-api
     spec:
       serviceAccountName: default
       containers:
@@ -76,7 +77,24 @@ spec:
             memory: 64Mi
           limits:
             cpu: 300m
-            memory: 128Mi  
+            memory: 128Mi
+        readinessProbe:
+          initialDelaySeconds: 15
+          httpGet:
+            path: /
+            port: 9001
+            httpHeaders:
+            - name: Custom-Header
+              value: Awesome  
+        livenessProbe:
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          httpGet:
+            path: /
+            port: 9001
+            httpHeaders:
+            - name: Custom-Header
+              value: Awesome         
       restartPolicy: Always
 
 ---
