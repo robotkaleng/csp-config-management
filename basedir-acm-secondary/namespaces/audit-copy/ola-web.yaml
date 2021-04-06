@@ -118,6 +118,7 @@ spec:
         app: ola-web
         service.istio.io/canonical-name: ola-web
     spec:
+      serviceAccountName: default
       containers:
       - name: ola-web
         image: im3iodev/ola-web-poc:1.0
