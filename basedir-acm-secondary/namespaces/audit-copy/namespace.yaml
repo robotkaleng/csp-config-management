@@ -4,4 +4,3 @@ metadata:
   name: audit-copy
   labels:
     istio.io/rev: asm-192-1
-    istio-injection: enabled
