@@ -81,7 +81,7 @@ spec:
         readinessProbe:
           initialDelaySeconds: 15
           httpGet:
-            path: /
+            path: /api/readiness
             port: 9001
             httpHeaders:
             - name: Custom-Header
@@ -90,7 +90,7 @@ spec:
           initialDelaySeconds: 15
           periodSeconds: 10
           httpGet:
-            path: /
+            path: /api/readiness
             port: 9001
             httpHeaders:
             - name: Custom-Header
